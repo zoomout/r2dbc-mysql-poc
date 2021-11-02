@@ -1,0 +1,30 @@
+version: '3'
+services:
+  myservice.service:
+    build:
+      context: ./
+    ports:
+      - "8088:8088"
+      - "6006:6006"
+    command: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:6006"
+    environment:
+      - "MY_SERVICE_DB_HOST=myservice.database:3366"
+    depends_on:
+      - myservice.flyway
+  myservice.database:
+    image: "mysql:8.0.27"
+    environment:
+      - "MYSQL_TCP_PORT=3366"
+      - "MYSQL_USER=db_user"
+      - "MYSQL_PASSWORD=db_password"
+      - "MYSQL_DATABASE=my_database"
+      - "MYSQL_ROOT_PASSWORD=db_root_password"
+    ports:
+      - "3366:3366"
+  myservice.flyway:
+    image: flyway/flyway
+    command: -url=jdbc:mysql://myservice.database:3366 -schemas=my_database -user=root -password=db_root_password -connectRetries=60 migrate
+    volumes:
+      - ./flyway:/flyway/sql
+    depends_on:
+      - myservice.database
