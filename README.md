@@ -7,7 +7,6 @@
 - Spring boot WebFlux
 - R2DBC MySQL DB library
 - Maven
-- R2DBC
 - Flyway
 
 ## APIs
